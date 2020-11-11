@@ -7,8 +7,6 @@ import java.util.Objects;
 @Entity
 public class City implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
@@ -25,10 +23,6 @@ public class City implements Serializable {
     this.id = id;
     this.name = name;
     this.state = state;
-  }
-
-  public static long getSerialVersionUID() {
-    return serialVersionUID;
   }
 
   public Integer getId() {

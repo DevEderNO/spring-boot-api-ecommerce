@@ -1,5 +1,7 @@
 package com.devederno.cursomc.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -9,13 +11,12 @@ import java.util.Objects;
 @Entity
 public class State implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
   private String name;
 
+  @JsonIgnore
   @OneToMany(mappedBy = "state")
   private List<City> cities = new ArrayList<>();
 
@@ -25,10 +26,6 @@ public class State implements Serializable {
   public State(Integer id, String name) {
     this.id = id;
     this.name = name;
-  }
-
-  public static long getSerialVersionUID() {
-    return serialVersionUID;
   }
 
   public Integer getId() {

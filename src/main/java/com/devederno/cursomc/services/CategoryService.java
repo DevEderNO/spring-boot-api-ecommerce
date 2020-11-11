@@ -22,4 +22,9 @@ public class CategoryService implements Serializable {
     obj.orElseThrow(() -> new ObjectNotFoundException("Objeto não encontrado! Id: " + id + ", Tipo: " + Category.class.getName()));
     return obj.get();
   }
+
+  public Category insert(Category obj) {
+    obj.setId(null);
+    return repo.save(obj);
+  }
 }

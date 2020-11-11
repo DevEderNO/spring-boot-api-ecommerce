@@ -1,13 +1,14 @@
 package com.devederno.cursomc.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
 public class Address implements Serializable {
-
-  private static final long serialVersionUID = 1L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,6 +19,7 @@ public class Address implements Serializable {
   private String neighborhood;
   private String zipCode;
 
+  @JsonIgnore
   @ManyToOne
   @JoinColumn(name = "client_id")
   private Client client;

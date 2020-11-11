@@ -1,6 +1,7 @@
 package com.devederno.cursomc.domain;
 
 import com.devederno.cursomc.domain.types.ClientType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -23,6 +24,10 @@ public class Client implements Serializable {
   @ElementCollection
   @CollectionTable(name = "PHONE")
   private Set<String> phones = new HashSet<>();
+
+  @JsonIgnore
+  @OneToMany(mappedBy = "client")
+  private List<Order> orders = new ArrayList<>();
 
   public Client() {
   }
@@ -91,6 +96,14 @@ public class Client implements Serializable {
     this.phones = phones;
   }
 
+  public List<Order> getOrders() {
+    return orders;
+  }
+
+  public void setOrders(List<Order> orders) {
+    this.orders = orders;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -103,6 +116,4 @@ public class Client implements Serializable {
   public int hashCode() {
     return Objects.hash(id);
   }
-
-
 }
