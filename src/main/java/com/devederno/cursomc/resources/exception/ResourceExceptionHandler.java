@@ -1,5 +1,6 @@
 package com.devederno.cursomc.resources.exception;
 
+import com.devederno.cursomc.services.exeptions.DataIntegrityException;
 import com.devederno.cursomc.services.exeptions.ObjectNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,19 @@ public class ResourceExceptionHandler {
     @ExceptionHandler(ObjectNotFoundException.class)
     public ResponseEntity<StandardError> objectNotFound(ObjectNotFoundException e, HttpServletRequest request) {
         HttpStatus status = HttpStatus.NOT_FOUND;
+        StandardError err = new StandardError(
+                System.currentTimeMillis(),
+                status.value(),
+                "Não encontrado",
+                e.getMessage(), request.getRequestURI()
+        );
+
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(DataIntegrityException.class)
+    public ResponseEntity<StandardError> dataIntegrity(DataIntegrityException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
         StandardError err = new StandardError(
                 System.currentTimeMillis(),
                 status.value(),

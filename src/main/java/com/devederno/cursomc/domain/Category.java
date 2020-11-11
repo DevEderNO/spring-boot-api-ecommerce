@@ -12,7 +12,7 @@ public class Category implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
-  private String nome;
+  private String name;
 
   @ManyToMany(mappedBy = "categories")
   private List<Product> products = new ArrayList<>();
@@ -20,9 +20,9 @@ public class Category implements Serializable {
   public Category() {
   }
 
-  public Category(Integer id, String nome) {
+  public Category(Integer id, String name) {
     this.id = id;
-    this.nome = nome;
+    this.name = name;
   }
 
   public Integer getId() {
@@ -33,12 +33,12 @@ public class Category implements Serializable {
     this.id = id;
   }
 
-  public String getNome() {
-    return nome;
+  public String getName() {
+    return name;
   }
 
-  public void setNome(String nome) {
-    this.nome = nome;
+  public void setName(String name) {
+    this.name = name;
   }
 
   public List<Product> getProducts() {
