@@ -4,6 +4,7 @@ import com.devederno.cursomc.domain.types.ClientType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.util.*;
 
@@ -18,7 +19,7 @@ public class Client implements Serializable {
   private String cpfOrCnpj;
   private Integer type;
 
-  @OneToMany(mappedBy = "client")
+  @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
   private List<Address> addresses = new ArrayList<>();
 
   @ElementCollection
@@ -37,7 +38,7 @@ public class Client implements Serializable {
     this.name = name;
     this.email = email;
     this.cpfOrCnpj = cpfOrCnpj;
-    this.type = type.getCod();
+    this.type = type == null ? null : type.getCod();
   }
 
   public Integer getId() {

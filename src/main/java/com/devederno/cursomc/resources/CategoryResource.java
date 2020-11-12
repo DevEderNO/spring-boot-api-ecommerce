@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,30 +41,44 @@ public class CategoryResource {
   }
 
   @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-  public ResponseEntity<Category> find(@PathVariable Integer id) {
+  public ResponseEntity<Category> find(
+    @PathVariable Integer id
+  ) {
     Category cat = service.findById(id);
     return ResponseEntity.ok().body(cat);
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public ResponseEntity<Void> create(@RequestBody Category obj) {
-    obj = service.insert(obj);
+  public ResponseEntity<Void> create(
+    @Valid
+    @RequestBody CategoryDTO obj
+  ) {
+    Category category = service.fromDTO(obj);
+    service.insert(category);
     URI uri = ServletUriComponentsBuilder
       .fromCurrentRequestUri()
       .path("/{id}")
-      .buildAndExpand(obj.getId())
+      .buildAndExpand(category.getId())
       .toUri();
     return ResponseEntity.created(uri).build();
   }
 
   @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<Void> update(@RequestBody Category obj, @PathVariable Integer id) {
+  public ResponseEntity<Void> update(
+    @Valid
+    @RequestBody CategoryDTO objDTO,
+    @PathVariable Integer id
+  ) {
+    Category obj = service.fromDTO(objDTO);
+    obj.setId(id);
     service.update(obj);
     return ResponseEntity.noContent().build();
   }
 
   @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity<Void> delete(@PathVariable Integer id) {
+  public ResponseEntity<Void> delete(
+    @PathVariable Integer id
+  ) {
     service.delete(id);
     return ResponseEntity.noContent().build();
   }
