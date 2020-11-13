@@ -1,10 +1,12 @@
 package com.devederno.cursomc.domain;
 
 import com.devederno.cursomc.domain.types.PaymentStatus;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import javax.persistence.Entity;
 
 @Entity
+@JsonTypeName("paymentCard")
 public class PaymentCard extends Payment {
 
   private Integer parcelNumber;

@@ -2,18 +2,24 @@ package com.devederno.cursomc.services.validation;
 
 import com.devederno.cursomc.domain.Client;
 import com.devederno.cursomc.domain.types.ClientType;
-import com.devederno.cursomc.dto.ClientNewDTO;
+import com.devederno.cursomc.dto.ClientDTO;
 import com.devederno.cursomc.repositories.ClientRepository;
 import com.devederno.cursomc.resources.exception.FieldMessage;
 import com.devederno.cursomc.services.validation.utils.BR;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.servlet.HandlerMapping;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class ClientInsertValidation implements ConstraintValidator<ClientInsert, ClientNewDTO> {
+public class ClientUpdateValidation implements ConstraintValidator<ClientInsert, ClientDTO> {
+
+  @Autowired
+  private HttpServletRequest request;
 
   @Autowired
   private ClientRepository repo;
@@ -23,19 +29,16 @@ public class ClientInsertValidation implements ConstraintValidator<ClientInsert,
   }
 
   @Override
-  public boolean isValid(ClientNewDTO objDto, ConstraintValidatorContext context) {
-    List<FieldMessage> list = new ArrayList<>();
+  public boolean isValid(ClientDTO objDto, ConstraintValidatorContext context) {
 
-    if (objDto.getType().equals(ClientType.PESSOA_FISICA.getCod()) && !BR.isValidCPF(objDto.getCpfOrCnpj())) {
-      list.add(new FieldMessage("cpfOrCnpj", "CPF inválido"));
-    }
-    if (objDto.getType().equals(ClientType.PESSOA_JURIDICA.getCod()) && !BR.isValidCNPJ(objDto.getCpfOrCnpj())) {
-      list.add(new FieldMessage("cpfOrCnpj", "CNPJ inválido"));
-    }
+    Map<String, String> map = (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+    Integer uriId = Integer.parseInt(map.get("id"));
+
+    List<FieldMessage> list = new ArrayList<>();
 
     Client obj = repo.findByEmail(objDto.getEmail());
 
-    if (obj != null) {
+    if (obj != null && !obj.getId().equals(uriId)) {
       list.add(new FieldMessage("email", "E-mail já cadastrado"));
     }
 

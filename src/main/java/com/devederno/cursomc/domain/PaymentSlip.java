@@ -3,11 +3,13 @@ package com.devederno.cursomc.domain;
 
 import com.devederno.cursomc.domain.types.PaymentStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import javax.persistence.Entity;
 import java.util.Date;
 
 @Entity
+@JsonTypeName("paymentSlip")
 public class PaymentSlip extends Payment {
 
   @JsonFormat(pattern = "dd/MM/yyyy")

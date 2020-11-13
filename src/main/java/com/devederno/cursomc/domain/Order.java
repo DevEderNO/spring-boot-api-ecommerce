@@ -4,13 +4,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
-@Table(name="ODER")
+@Table(name = "ODER")
 public class Order implements Serializable {
 
   @Id
@@ -42,6 +39,14 @@ public class Order implements Serializable {
     this.instant = instant;
     this.client = client;
     this.deliveryAddress = deliveryAddress;
+  }
+
+  public double getTotal() {
+    double total = 0;
+    for (OrderItem item : items) {
+      total += item.getSubTotal();
+    }
+    return total;
   }
 
   public Integer getId() {
