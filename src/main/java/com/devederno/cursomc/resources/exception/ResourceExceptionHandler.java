@@ -1,5 +1,6 @@
 package com.devederno.cursomc.resources.exception;
 
+import com.devederno.cursomc.services.exeptions.AuthorizationException;
 import com.devederno.cursomc.services.exeptions.DataIntegrityException;
 import com.devederno.cursomc.services.exeptions.ObjectNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -57,6 +58,20 @@ public class ResourceExceptionHandler {
     for (FieldError x : e.getBindingResult().getFieldErrors()) {
       err.addError(x.getField(), x.getDefaultMessage());
     }
+
+    return ResponseEntity.status(status).body(err);
+  }
+
+  @ExceptionHandler(AuthorizationException.class)
+  public ResponseEntity<StandardError> authorization(AuthorizationException e, HttpServletRequest request) {
+    HttpStatus status = HttpStatus.FORBIDDEN;
+    StandardError err = new StandardError(
+      System.currentTimeMillis(),
+      status.value(),
+      e.getMessage(),
+      e.getClass().getName(),
+      request.getRequestURI()
+    );
 
     return ResponseEntity.status(status).body(err);
   }

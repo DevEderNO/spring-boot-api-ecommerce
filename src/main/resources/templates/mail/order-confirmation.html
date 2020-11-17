@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title th:remove="all">Order Confirmation</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="theme-color" content="#ff9000"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *{
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      outline:0;
+    }
+
+    body {
+      background: #312e38;
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body,input, button {
+      font-family: 'Roboto Slab', serif;
+      font-size: 16px;
+    }
+
+    h1, h2, h3, h4, h5, h6, strong {
+      font-weight: 500;
+    }
+
+    h1 {
+      color: #959908;
+    }
+
+    button {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<div>
+  <h1>
+    Pedido número: <span th:text="${order.id}"> </span>
+  </h1>
+  <p>
+    Instante: <span th:text="${#dates.format(order.instant, 'dd/MM/yyyy hh:mm')}"></span>
+  </p>
+  <p>
+    Cliente: <span th:text="${order.client.name}"></span>
+  </p>
+  <p>
+    Situação do pagamento: <span th:text="${order.payment.status}"></span>
+  </p>
+  <h3>Detalhes do order:</h3>
+  <table border="1">
+    <tr>
+      <th>Produto</th>
+      <th>Quantidade</th>
+      <th>Preço unitário</th>
+      <th>Subtotal</th>
+    </tr>
+    <tr th:each="item : ${order.items}">
+      <td th:text="${item.id.product.name}">nome</td>
+      <td th:text="${item.quantity}">quantidade</td>
+      <td th:text="${#numbers.formatDecimal(item.price, 0, 'POINT', 2, 'COMMA')}">preco</td>
+      <td th:text="${#numbers.formatDecimal(item.subTotal, 0, 'POINT', 2, 'COMMA')}">subTotal</td>
+    </tr>
+  </table>
+  <p>
+    Valor total: <span th:text="${#numbers.formatDecimal(order.total, 0, 'POINT', 2, 'COMMA')}"></span>
+  </p>
+</div>
+</body>
+</html>

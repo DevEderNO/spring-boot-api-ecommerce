@@ -3,8 +3,10 @@ package com.devederno.cursomc.services;
 import com.devederno.cursomc.domain.*;
 import com.devederno.cursomc.domain.types.ClientType;
 import com.devederno.cursomc.domain.types.PaymentStatus;
+import com.devederno.cursomc.domain.types.Profile;
 import com.devederno.cursomc.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -40,6 +42,9 @@ public class DBService {
 
   @Autowired
   private OrderItemRepository orderItemRepository;
+
+  @Autowired
+  private BCryptPasswordEncoder bcrypt;
 
   public void instantiateTestDatabase() throws ParseException {
 
@@ -104,8 +109,19 @@ public class DBService {
       "Maria Silva",
       "maria@gmail.com",
       "36378912377",
-      ClientType.PESSOA_FISICA);
+      ClientType.PESSOA_FISICA,
+      bcrypt.encode("123")
+    );
+    Client client2 = new Client(null,
+      "Ana Costa",
+      "ana@gmail.com",
+      "00179174096",
+      ClientType.PESSOA_FISICA,
+      bcrypt.encode("123")
+    );
     client1.getPhones().addAll(Arrays.asList("6227363323", "6233335555"));
+    client2.getPhones().addAll(Arrays.asList("6235652148", "62521469874"));
+    client2.addProfile(Profile.ADMIN);
 
     Address address1 = new Address(null,
       "Rua Flores",
@@ -123,10 +139,19 @@ public class DBService {
       "75526832104",
       client1,
       city2);
+    Address address3 = new Address(null,
+      "Av Floriano",
+      "2106",
+      null,
+      "Centro",
+      "281777012",
+      client2,
+      city2);
 
     client1.getAddresses().addAll(Arrays.asList(address1, address2));
+    client2.getAddresses().addAll(Arrays.asList(address3));
 
-    clientRepository.save(client1);
+    clientRepository.saveAll(Arrays.asList(client1, client2));
     addressRepository.saveAll(Arrays.asList(address1, address2));
 
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");

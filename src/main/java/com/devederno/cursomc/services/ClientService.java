@@ -4,10 +4,13 @@ import com.devederno.cursomc.domain.Address;
 import com.devederno.cursomc.domain.City;
 import com.devederno.cursomc.domain.Client;
 import com.devederno.cursomc.domain.types.ClientType;
+import com.devederno.cursomc.domain.types.Profile;
 import com.devederno.cursomc.dto.ClientDTO;
 import com.devederno.cursomc.dto.ClientNewDTO;
 import com.devederno.cursomc.repositories.AddressRepository;
 import com.devederno.cursomc.repositories.ClientRepository;
+import com.devederno.cursomc.security.UserSS;
+import com.devederno.cursomc.services.exeptions.AuthorizationException;
 import com.devederno.cursomc.services.exeptions.DataIntegrityException;
 import com.devederno.cursomc.services.exeptions.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +18,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +34,14 @@ public class ClientService {
   @Autowired
   private AddressRepository addressRepository;
 
+  @Autowired
+  private BCryptPasswordEncoder bcrypt;
+
   public Client findById(Integer id) {
+    UserSS user = UserService.authenticated();
+    if(user == null || !user.hasHole(Profile.ADMIN) && !id.equals(user.getId())){
+      throw new AuthorizationException("Acesso negado");
+    }
     Optional<Client> obj = repo.findById(id);
     obj.orElseThrow(() -> new ObjectNotFoundException(
       "Objeto não encontrado! Id: " + id + ", Tipo: " + Client.class.getName())
@@ -72,7 +83,7 @@ public class ClientService {
   }
 
   public Client fromDTO(ClientDTO obj) {
-    return new Client(obj.getId(), obj.getName(), obj.getEmail(), null, null);
+    return new Client(obj.getId(), obj.getName(), obj.getEmail(), null, null, null);
   }
 
   public Client fromDTO(ClientNewDTO obj) {
@@ -81,7 +92,8 @@ public class ClientService {
       obj.getName(),
       obj.getEmail(),
       obj.getCpfOrCnpj(),
-      ClientType.toEnum(obj.getType())
+      ClientType.toEnum(obj.getType()),
+      bcrypt.encode(obj.getPassword())
     );
     City city = new City(obj.getCityId(), null, null);
     Address address = new Address(

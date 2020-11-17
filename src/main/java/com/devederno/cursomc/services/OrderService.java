@@ -7,8 +7,13 @@ import com.devederno.cursomc.domain.types.PaymentStatus;
 import com.devederno.cursomc.repositories.OrderItemRepository;
 import com.devederno.cursomc.repositories.OrderRepository;
 import com.devederno.cursomc.repositories.PaymentRepository;
+import com.devederno.cursomc.security.UserSS;
+import com.devederno.cursomc.services.exeptions.AuthorizationException;
 import com.devederno.cursomc.services.exeptions.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,5 +74,15 @@ public class OrderService {
     orderItemRepository.saveAll(obj.getItems());
     mailService.sendOrderConfirmationHtmlMail(obj);
     return obj;
+  }
+
+  public Page<Order> findPage(Integer page, Integer linesPerPage, String orderBy, String direction) {
+    UserSS user = UserService.authenticated();
+    if(user == null){
+      throw new AuthorizationException("Acesso negado");
+    }
+    PageRequest pageRequest = PageRequest.of(page, linesPerPage, Sort.Direction.valueOf(direction), orderBy);
+
+    return repo.findAll(pageRequest);
   }
 }

@@ -23,6 +23,9 @@ public class ClientNewDTO {
   private Integer type;
 
   @NotEmpty(message = "Preenchimento obrigatório")
+  private String password;
+
+  @NotEmpty(message = "Preenchimento obrigatório")
   private String street;
   @NotEmpty(message = "Preenchimento obrigatório")
   private String number;
@@ -143,5 +146,13 @@ public class ClientNewDTO {
 
   public void setCityId(Integer cityId) {
     this.cityId = cityId;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
   }
 }

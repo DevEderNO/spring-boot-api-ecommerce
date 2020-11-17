@@ -43,7 +43,7 @@ public abstract class AbstractMailService implements MailService {
   protected String htmlFromTemplateOrder(Order obj) {
     Context context = new Context();
     context.setVariable("order", obj);
-    return templateEngine.process("mail/orderConfirmation", context);
+    return templateEngine.process("mail/order-confirmation", context);
   }
 
   @Override
@@ -66,6 +66,4 @@ public abstract class AbstractMailService implements MailService {
     mmh.setText(htmlFromTemplateOrder(obj), true);
     return message;
   }
-
-  ;
 }
