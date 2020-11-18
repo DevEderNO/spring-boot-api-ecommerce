@@ -1,7 +1,11 @@
 package com.devederno.cursomc.resources.exception;
 
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.devederno.cursomc.services.exeptions.AuthorizationException;
 import com.devederno.cursomc.services.exeptions.DataIntegrityException;
+import com.devederno.cursomc.services.exeptions.FileException;
 import com.devederno.cursomc.services.exeptions.ObjectNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +25,8 @@ public class ResourceExceptionHandler {
     StandardError err = new StandardError(
       System.currentTimeMillis(),
       status.value(),
-      "Não encontrado",
-      e.getClass().getName(),
+      "Not found",
+      e.getMessage(),
       request.getRequestURI()
     );
 
@@ -35,8 +39,8 @@ public class ResourceExceptionHandler {
     StandardError err = new StandardError(
       System.currentTimeMillis(),
       status.value(),
-      "Não encontrado",
-      e.getClass().getName(),
+      "Data integrity error",
+      e.getMessage(),
       request.getRequestURI()
     );
 
@@ -46,12 +50,12 @@ public class ResourceExceptionHandler {
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<StandardError> dataIntegrity(MethodArgumentNotValidException e, HttpServletRequest request) {
 
-    HttpStatus status = HttpStatus.BAD_REQUEST;
+    HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
     ValidationError err = new ValidationError(
       System.currentTimeMillis(),
       status.value(),
-      "Erro de validação",
-      e.getClass().getName(),
+      "Validation error",
+      e.getMessage(),
       request.getRequestURI()
     );
 
@@ -68,8 +72,64 @@ public class ResourceExceptionHandler {
     StandardError err = new StandardError(
       System.currentTimeMillis(),
       status.value(),
+      "Data integrity error",
       e.getMessage(),
-      e.getClass().getName(),
+      request.getRequestURI()
+    );
+
+    return ResponseEntity.status(status).body(err);
+  }
+
+  @ExceptionHandler(FileException.class)
+  public ResponseEntity<StandardError> authorization(FileException e, HttpServletRequest request) {
+    HttpStatus status = HttpStatus.BAD_REQUEST;
+    StandardError err = new StandardError(
+      System.currentTimeMillis(),
+      status.value(),
+      "File error",
+      e.getMessage(),
+      request.getRequestURI()
+    );
+
+    return ResponseEntity.status(status).body(err);
+  }
+
+  @ExceptionHandler(AmazonServiceException.class)
+  public ResponseEntity<StandardError> authorization(AmazonServiceException e, HttpServletRequest request) {
+    HttpStatus code = HttpStatus.valueOf(e.getErrorCode());
+    StandardError err = new StandardError(
+      System.currentTimeMillis(),
+      code.value(),
+      "Amazon service error",
+      e.getMessage(),
+      request.getRequestURI()
+    );
+
+    return ResponseEntity.status(code).body(err);
+  }
+
+  @ExceptionHandler(AmazonClientException.class)
+  public ResponseEntity<StandardError> authorization(AmazonClientException e, HttpServletRequest request) {
+    HttpStatus status = HttpStatus.BAD_REQUEST;
+    StandardError err = new StandardError(
+      System.currentTimeMillis(),
+      status.value(),
+      "Amazon client error",
+      e.getMessage(),
+      request.getRequestURI()
+    );
+
+    return ResponseEntity.status(status).body(err);
+  }
+
+  @ExceptionHandler(AmazonS3Exception.class)
+  public ResponseEntity<StandardError> authorization(AmazonS3Exception e, HttpServletRequest request) {
+    HttpStatus status = HttpStatus.BAD_REQUEST;
+    StandardError err = new StandardError(
+      System.currentTimeMillis(),
+      status.value(),
+      "S3 error",
+      e.getMessage(),
       request.getRequestURI()
     );
 

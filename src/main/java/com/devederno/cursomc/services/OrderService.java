@@ -1,5 +1,6 @@
 package com.devederno.cursomc.services;
 
+import com.devederno.cursomc.domain.Client;
 import com.devederno.cursomc.domain.Order;
 import com.devederno.cursomc.domain.OrderItem;
 import com.devederno.cursomc.domain.PaymentSlip;
@@ -78,11 +79,11 @@ public class OrderService {
 
   public Page<Order> findPage(Integer page, Integer linesPerPage, String orderBy, String direction) {
     UserSS user = UserService.authenticated();
-    if(user == null){
+    if (user == null) {
       throw new AuthorizationException("Acesso negado");
     }
     PageRequest pageRequest = PageRequest.of(page, linesPerPage, Sort.Direction.valueOf(direction), orderBy);
-
-    return repo.findAll(pageRequest);
+    Client client = clientService.findById(user.getId());
+    return repo.findByClient(client, pageRequest);
   }
 }

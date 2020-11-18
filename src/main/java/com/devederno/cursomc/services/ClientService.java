@@ -14,6 +14,7 @@ import com.devederno.cursomc.services.exeptions.AuthorizationException;
 import com.devederno.cursomc.services.exeptions.DataIntegrityException;
 import com.devederno.cursomc.services.exeptions.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,7 +22,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.image.BufferedImage;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,9 +41,21 @@ public class ClientService {
   @Autowired
   private BCryptPasswordEncoder bcrypt;
 
+  @Autowired
+  private S3Service s3Service;
+
+  @Autowired
+  private ImageService imageService;
+
+  @Value("${img.prefix.client.profile}")
+  private String imgPrefix;
+
+  @Value("${img.profile.size}")
+  private Integer imgSize;
+
   public Client findById(Integer id) {
     UserSS user = UserService.authenticated();
-    if(user == null || !user.hasHole(Profile.ADMIN) && !id.equals(user.getId())){
+    if (user == null || !user.hasHole(Profile.ADMIN) && !id.equals(user.getId())) {
       throw new AuthorizationException("Acesso negado");
     }
     Optional<Client> obj = repo.findById(id);
@@ -47,6 +63,23 @@ public class ClientService {
       "Objeto não encontrado! Id: " + id + ", Tipo: " + Client.class.getName())
     );
     return obj.get();
+  }
+
+  public Client findByEmail(String email) {
+    Client obj = repo.findByEmail(email);
+    if (obj == null) {
+      throw new ObjectNotFoundException("Email não encontrado");
+    }
+    return obj;
+  }
+
+  public Client findAuthenticatedUserByEmail(String email) {
+    UserSS user = UserService.authenticated();
+    if (user == null || !user.hasHole(Profile.ADMIN) && !email.equals(user.getUsername())) {
+      throw new AuthorizationException("Acesso negado");
+    }
+    Client obj = findByEmail(email);
+    return obj;
   }
 
   public List<Client> findAll() {
@@ -71,7 +104,6 @@ public class ClientService {
     updateData(newObj, obj);
     return repo.save(newObj);
   }
-
 
   public void delete(Integer id) {
     Client obj = findById(id);
@@ -120,6 +152,20 @@ public class ClientService {
   private void updateData(Client newObj, Client obj) {
     newObj.setName(obj.getName());
     newObj.setEmail(obj.getEmail());
+  }
+
+  public URI uploadProfilePicture(MultipartFile multipartFile) {
+    UserSS user = UserService.authenticated();
+    URI uri = s3Service.uploadFile(multipartFile);
+
+    BufferedImage jpgImage = imageService.getJpgImageFromFile(multipartFile);
+
+    jpgImage = imageService.cropSquare(jpgImage);
+    jpgImage = imageService.resize(jpgImage, imgSize);
+
+    String filename = imgPrefix + user.getId() + ".jpg";
+
+    return s3Service.uploadFile(imageService.getInputStream(jpgImage, "jpg"), filename, "image");
   }
 
 }

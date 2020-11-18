@@ -1,5 +1,6 @@
 package com.devederno.cursomc.services;
 
+import com.devederno.cursomc.domain.Client;
 import com.devederno.cursomc.domain.Order;
 import org.springframework.mail.SimpleMailMessage;
 
@@ -14,4 +15,6 @@ public interface MailService {
   void sendOrderConfirmationHtmlMail(Order obj);
 
   void sendHtmlMail(MimeMessage message);
+
+  void sendNewPasswordMail(Client client, String newPassword);
 }

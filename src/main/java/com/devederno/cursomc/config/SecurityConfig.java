@@ -42,11 +42,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   public static final String[] PUBLIC_MATCHES_GET = {
     "/products/**",
-    "/categories/**"
+    "/categories/**",
+    "/states/**"
   };
 
   public static final String[] PUBLIC_MATCHES_POST = {
-    "/clients/**"
+    "/clients",
+    "/auth/forgot/**"
   };
 
   @Override

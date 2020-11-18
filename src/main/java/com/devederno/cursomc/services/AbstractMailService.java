@@ -1,5 +1,6 @@
 package com.devederno.cursomc.services;
 
+import com.devederno.cursomc.domain.Client;
 import com.devederno.cursomc.domain.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -66,4 +67,22 @@ public abstract class AbstractMailService implements MailService {
     mmh.setText(htmlFromTemplateOrder(obj), true);
     return message;
   }
+
+  @Override
+  public void sendNewPasswordMail(Client client, String newPassword) {
+    SimpleMailMessage message = newPasswordMail(client, newPassword);
+    sendMail(message);
+  }
+
+  protected SimpleMailMessage newPasswordMail(Client client, String newPassword) {
+    SimpleMailMessage message = new SimpleMailMessage();
+    message.setTo(client.getEmail());
+    message.setFrom(sender);
+    message.setSubject("Solicitação de nova senha");
+    message.setSentDate(new Date(System.currentTimeMillis()));
+    message.setText("Nova senha: " + newPassword);
+    return message;
+  }
+
+  ;
 }
