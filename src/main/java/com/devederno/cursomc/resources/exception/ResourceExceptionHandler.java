@@ -3,10 +3,7 @@ package com.devederno.cursomc.resources.exception;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
-import com.devederno.cursomc.services.exeptions.AuthorizationException;
-import com.devederno.cursomc.services.exeptions.DataIntegrityException;
-import com.devederno.cursomc.services.exeptions.FileException;
-import com.devederno.cursomc.services.exeptions.ObjectNotFoundException;
+import com.devederno.cursomc.services.exeptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -129,6 +126,20 @@ public class ResourceExceptionHandler {
       System.currentTimeMillis(),
       status.value(),
       "S3 error",
+      e.getMessage(),
+      request.getRequestURI()
+    );
+
+    return ResponseEntity.status(status).body(err);
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<StandardError> access(AccessDeniedException e, HttpServletRequest request) {
+    HttpStatus status = HttpStatus.FORBIDDEN;
+    StandardError err = new StandardError(
+      System.currentTimeMillis(),
+      status.value(),
+      "Forbidden",
       e.getMessage(),
       request.getRequestURI()
     );
