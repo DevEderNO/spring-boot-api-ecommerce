@@ -159,7 +159,6 @@ public class ClientService {
 
   public URI uploadProfilePicture(MultipartFile multipartFile) {
     UserSS user = UserService.authenticated();
-    URI uri = s3Service.uploadFile(multipartFile);
 
     BufferedImage jpgImage = imageService.getJpgImageFromFile(multipartFile);
 
